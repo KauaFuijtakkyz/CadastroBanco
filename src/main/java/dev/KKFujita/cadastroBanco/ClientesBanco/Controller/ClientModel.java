@@ -16,7 +16,7 @@ public class ClientModel {
     @Column (name = "nome")
     private String nome;
 
-    @Column (name = "idade
+    @Column (name = "idade")
     private int idade;
 
     @Column (unique = true)
