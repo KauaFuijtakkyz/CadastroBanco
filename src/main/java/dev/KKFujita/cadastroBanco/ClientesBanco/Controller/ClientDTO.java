@@ -1,4 +1,4 @@
 package dev.KKFujita.cadastroBanco.ClientesBanco.Controller;
 
-public class ClienteMapper {
+public class ClientDTO {
 }
