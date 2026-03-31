@@ -20,16 +20,16 @@ public class ClientModel {
     private int idade;
 
     @Column (unique = true)
-    private int CPF;
+    private Long CPF;
 
     @Column (unique = true)
-    private int RG;
+    private Long RG;
 
     @Column (unique = true)
     private String email;
 
-    @Column (name = "numeroTefelone")
-    private int numeroTelefone;
+    @Column (name = "numeroTelefone")
+    private Long numeroTelefone;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

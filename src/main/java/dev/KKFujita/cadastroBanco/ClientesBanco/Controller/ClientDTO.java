@@ -13,7 +13,7 @@ public class ClientDTO {
     private String nome;
     private int idade;
     private String email;
-    private int RG;
-    private int CPF;
-    private int numeroTelefone;
+    private Long RG;
+    private Long CPF;
+    private Long numeroTelefone;
 }
