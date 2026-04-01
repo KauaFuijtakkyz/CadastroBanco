@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciamento de Clientes</title>
+    <style>
+        /* Estilos Gerais */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; margin: 0; padding: 40px; color: #333; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+
+        h1 { color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+
+        /* Mensagem de Sucesso */
+        .alert { padding: 15px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 5px; margin-bottom: 20px; animation: fadein 0.5s; }
+        @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Estilo da Tabela */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background-color: #fff; }
+        th { background-color: #34495e; color: white; padding: 12px; text-align: left; text-transform: uppercase; font-size: 13px; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+        tr:hover { background-color: #f1f4f6; transition: 0.3s; }
+
+        /* Botão Excluir */
+        .btn-delete { background-color: #e74c3c; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: bold; transition: 0.2s; }
+        .btn-delete:hover { background-color: #c0392b; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+        /* Espaçamento das Ações */
+        .col-acoes { text-align: center; width: 100px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Lista de Clientes</h1>
+
+    <!-- MENSAGEM DE SUCESSO (Aparece aqui no topo da tabela) -->
+    <div th:if="${mensagem}" class="alert">
+        <span th:text="${mensagem}"></span>
+    </div>
+    <div style="margin-bottom: 20px;">
+        <a th:href="@{/clientes/cadastrar}"
+           style="background-color: #3498db; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+            + Novo Cliente
+        </a>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Idade</th>
+            <th>Telefone</th>
+            <th>Email</th>
+            <th>CPF</th>
+            <th>RG</th>
+            <th class="col-acoes">Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="c : ${cliente}">
+            <td th:text="${c.id}"></td>
+            <td th:text="${c.nome}"></td>
+            <td th:text="${c.idade}"></td>
+            <td th:text="${c.numeroTelefone}"></td>
+            <td th:text="${c.email}"></td>
+            <td th:text="${c.CPF}"></td>
+            <td th:text="${c.RG}"></td>
+            <td class="col-acoes">
+                <a th:href="@{/clientes/delete/{id}(id=${c.id})}"
+                   onclick="return confirm('Tem certeza que deseja excluir este cliente?')"
+                   class="btn-delete">
+                    Excluir
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
