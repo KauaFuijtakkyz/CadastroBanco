@@ -6,10 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -22,9 +19,13 @@ public class ClientControllerUI {
 
 
     @GetMapping("/listar")
-    public String listaclientes(Model model) {
-        List<ClientDTO> listaclientes = clientService.listaclientes();
+    public String listaclientes(@RequestParam(value = "busca", required = false) String busca, Model model) {
+        // Agora passamos a variável 'busca' para o service
+        List<ClientDTO> listaclientes = clientService.listaclientes(busca);
+
         model.addAttribute("cliente", listaclientes);
+        model.addAttribute("buscaAtiva", busca); // Isso mantém o texto na barra de busca após pesquisar
+
         return "listarclientes";
     }
     // 1. Método para mostrar o formulário

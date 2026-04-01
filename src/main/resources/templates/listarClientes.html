@@ -4,28 +4,25 @@
     <meta charset="UTF-8">
     <title>Gerenciamento de Clientes</title>
     <style>
-        /* Estilos Gerais */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; margin: 0; padding: 40px; color: #333; }
         .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-
         h1 { color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .alert { padding: 15px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 5px; margin-bottom: 20px; }
 
-        /* Mensagem de Sucesso */
-        .alert { padding: 15px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 5px; margin-bottom: 20px; animation: fadein 0.5s; }
-        @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+        /* Barra de Busca */
+        .search-container { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
+        .search-input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .btn-search { background-color: #34495e; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
 
-        /* Estilo da Tabela */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; background-color: #fff; }
-        th { background-color: #34495e; color: white; padding: 12px; text-align: left; text-transform: uppercase; font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; background-color: #fff; }
+        th { background-color: #34495e; color: white; padding: 12px; text-align: left; font-size: 13px; }
         td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
-        tr:hover { background-color: #f1f4f6; transition: 0.3s; }
+        tr:hover { background-color: #f1f4f6; }
 
-        /* Botão Excluir */
-        .btn-delete { background-color: #e74c3c; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: bold; transition: 0.2s; }
-        .btn-delete:hover { background-color: #c0392b; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-
-        /* Espaçamento das Ações */
-        .col-acoes { text-align: center; width: 100px; }
+        .btn-new { background-color: #27ae60; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block; margin-bottom: 20px; }
+        .btn-edit { background-color: #3498db; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: bold; margin-right: 5px; }
+        .btn-delete { background-color: #e74c3c; color: white; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: bold; }
+        .col-acoes { text-align: center; width: 160px; }
     </style>
 </head>
 <body>
@@ -33,15 +30,18 @@
 <div class="container">
     <h1>Lista de Clientes</h1>
 
-    <!-- MENSAGEM DE SUCESSO (Aparece aqui no topo da tabela) -->
-    <div th:if="${mensagem}" class="alert">
-        <span th:text="${mensagem}"></span>
-    </div>
-    <div style="margin-bottom: 20px;">
-        <a th:href="@{/clientes/cadastrar}"
-           style="background-color: #3498db; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
-            + Novo Cliente
-        </a>
+    <!-- Mensagem de Sucesso -->
+    <div th:if="${mensagem}" class="alert" th:text="${mensagem}"></div>
+
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <a th:href="@{/clientes/cadastrar}" class="btn-new">+ Novo Cliente</a>
+
+        <!-- Formulário de Busca -->
+        <form th:action="@{/clientes/listar}" method="get" class="search-container" style="width: 50%;">
+            <input type="text" name="busca" th:value="${buscaAtiva}" class="search-input" placeholder="Buscar por nome...">
+            <button type="submit" class="btn-search">Buscar</button>
+            <a th:if="${buscaAtiva}" th:href="@{/clientes/listar}" style="color: #e74c3c; font-size: 12px; text-decoration: none; margin-left: 5px;">Limpar</a>
+        </form>
     </div>
 
     <table>
@@ -67,11 +67,8 @@
             <td th:text="${c.CPF}"></td>
             <td th:text="${c.RG}"></td>
             <td class="col-acoes">
-                <a th:href="@{/clientes/delete/{id}(id=${c.id})}"
-                   onclick="return confirm('Tem certeza que deseja excluir este cliente?')"
-                   class="btn-delete">
-                    Excluir
-                </a>
+                <a th:href="@{/clientes/editar/{id}(id=${c.id})}" class="btn-edit">Editar</a>
+                <a th:href="@{/clientes/delete/{id}(id=${c.id})}" onclick="return confirm('Deseja excluir este cliente?')" class="btn-delete">Excluir</a>
             </td>
         </tr>
         </tbody>

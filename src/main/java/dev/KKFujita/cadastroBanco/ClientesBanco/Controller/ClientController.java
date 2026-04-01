@@ -12,6 +12,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
+import jakarta.validation.Valid; // Importante!
+import org.springframework.validation.BindingResult; // Importante!
+
 @Controller
 @RequestMapping("/clientes")
 public class ClientController {
@@ -23,30 +26,58 @@ public class ClientController {
         this.clientService = clientService;
     }
 
-    // Exibe a tabela de clientes
+    @GetMapping("/")
+    public String home() {
+        return "redirect:/clientes/listar";
+    }
+
+    // LISTAR COM FILTRO DE BUSCA
     @GetMapping("/listar")
-    public String listaclientes(Model model) {
-        List<ClientDTO> listarclientes = clientService.listaclientes();
+    public String listaclientes(@RequestParam(value = "busca", required = false) String busca, Model model) {
+        List<ClientDTO> listarclientes = clientService.listaclientes(busca);
         model.addAttribute("cliente", listarclientes);
+        model.addAttribute("buscaAtiva", busca); // Para manter o texto na barra de busca
         return "listarclientes";
     }
 
-    // Exibe o formulário de cadastro
     @GetMapping("/cadastrar")
     public String exibirFormulario(Model model) {
         model.addAttribute("clientDTO", new ClientDTO());
         return "cadastrarcliente";
     }
 
-    // Salva o cliente vindo do formulário
-    @PostMapping("/salvar")
-    public String salvarCliente(@ModelAttribute("clientDTO") ClientDTO dto, RedirectAttributes attributes) {
-        clientService.salvar(dto); // Agora este método funciona!
-        attributes.addFlashAttribute("mensagem", "Cliente " + dto.getNome() + " cadastrado com sucesso!");
+    @GetMapping("/editar/{id}")
+    public String exibirFormularioEdicao(@PathVariable Long id, Model model) {
+        ClientDTO clienteParaEditar = clientService.listarclientesid(id);
+        if (clienteParaEditar != null) {
+            model.addAttribute("clientDTO", clienteParaEditar);
+            return "editarcliente";
+        }
         return "redirect:/clientes/listar";
     }
 
-    // Deleta o cliente e redireciona
+    // SALVAR COM VALIDAÇÃO
+    @PostMapping("/salvar")
+    public String salvarCliente(@Valid @ModelAttribute("clientDTO") ClientDTO dto,
+                                BindingResult result,
+                                RedirectAttributes attributes) {
+
+        if (result.hasErrors()) {
+            return (dto.getId() != null) ? "editarcliente" : "cadastrarcliente";
+        }
+
+        try {
+            clientService.salvar(dto);
+            attributes.addFlashAttribute("mensagem", "Operação realizada com sucesso!");
+        } catch (RuntimeException e) {
+            // Se o Service lançar o erro de duplicata, capturamos aqui
+            attributes.addFlashAttribute("erroDuplicata", e.getMessage());
+            return (dto.getId() != null) ? "redirect:/clientes/editar/" + dto.getId() : "redirect:/clientes/cadastrar";
+        }
+
+        return "redirect:/clientes/listar";
+    }
+
     @GetMapping("/delete/{id}")
     public String deletarclienteporid(@PathVariable Long id, RedirectAttributes attributes) {
         if (clientService.listarclientesid(id) != null) {
@@ -55,11 +86,6 @@ public class ClientController {
         }
         return "redirect:/clientes/listar";
     }
-
-    // Mantido apenas para fins de teste/API se necessário
-    @GetMapping("/listar/{id}")
-    @ResponseBody // Adicionado para retornar JSON se você acessar essa URL direta
-    public ClientDTO listarclientesid(@PathVariable Long id) {
-        return clientService.listarclientesid(id);
-    }
 }
+
+

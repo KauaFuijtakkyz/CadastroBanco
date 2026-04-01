@@ -26,17 +26,17 @@ public class ClientModel {
     @Column (name = "idade")
     private Integer idade;
 
-    @Column (unique = true)
-    private Long CPF;
+    @Column (unique = true, nullable = false)
+    private String CPF;
 
-    @Column (unique = true)
-    private Long RG;
+    @Column (unique = true, nullable = false)
+    private String RG;
 
-    @Column (unique = true)
+    @Column (unique = true, nullable = false)
     private String email;
 
     @Column (name = "numeroTelefone")
-    private Long numeroTelefone;
+    private String numeroTelefone;
 
 
 
