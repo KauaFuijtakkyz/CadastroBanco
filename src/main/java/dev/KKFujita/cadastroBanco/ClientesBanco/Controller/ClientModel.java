@@ -13,11 +13,16 @@ import lombok.NoArgsConstructor;
 @Table(name = "tb_cadastro")
 public class ClientModel {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column (name = "id")
+    private Long id;
+
     @Column (name = "nome")
     private String nome;
 
     @Column (name = "idade")
-    private int idade;
+    private Integer idade;
 
     @Column (unique = true)
     private Long CPF;
@@ -31,10 +36,7 @@ public class ClientModel {
     @Column (name = "numeroTelefone")
     private Long numeroTelefone;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column (name = "id")
-    private Long id;
+
 
 
 
