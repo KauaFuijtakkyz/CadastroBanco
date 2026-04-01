@@ -20,53 +20,43 @@ public class ClientService {
         this.clientMapper = clientMapper;
     }
 
-    public List<ClientDTO> listaclientes(){
-        List<ClientModel> clientes = clientRepository.findAll();
+    // LISTAR OU BUSCAR POR NOME
+    public List<ClientDTO> listaclientes(String busca) {
+        List<ClientModel> clientes;
+        if (busca != null && !busca.isEmpty()) {
+            clientes = clientRepository.findByNomeContainingIgnoreCase(busca);
+        } else {
+            clientes = clientRepository.findAll();
+        }
         return clientes.stream()
                 .map(clientMapper::map)
                 .collect(Collectors.toList());
     }
 
-    public ClientDTO listarclientesid(Long id){
+    public ClientDTO listarclientesid(Long id) {
         Optional<ClientModel> clientid = clientRepository.findById(id);
         return clientid.map(clientMapper::map).orElse(null);
     }
 
-    // Este é o método que o seu formulário usa!
     public void salvar(ClientDTO dto) {
-        // 1. Converte DTO para Model (Entidade do banco)
-        ClientModel cliente = clientMapper.map(dto);
-        // 2. Salva no banco de dados através do Repository
-        clientRepository.save(cliente);
-    }
-
-    // Método usado para APIs ou chamadas internas
-    public ClientDTO adicionarcliente (ClientDTO clientDTO) {
-        ClientModel cliente = clientMapper.map(clientDTO);
-        cliente = clientRepository.save(cliente);
-        return clientMapper.map(cliente);
-    }
-
-    public ClientDTO atualizarcliente(Long id, ClientDTO clientDTO) {
-        Optional<ClientModel> clienteExistente = clientRepository.findById(id);
-
-        if (clienteExistente.isPresent()) {
-            ClientModel clienteBanco = clienteExistente.get();
-
-            if (clientDTO.getNome() != null) clienteBanco.setNome(clientDTO.getNome());
-            if (clientDTO.getEmail() != null) clienteBanco.setEmail(clientDTO.getEmail());
-            if (clientDTO.getIdade() != null) clienteBanco.setIdade(clientDTO.getIdade());
-            if (clientDTO.getCPF() != null) clienteBanco.setCPF(clientDTO.getCPF());
-            if (clientDTO.getRG() != null) clienteBanco.setRG(clientDTO.getRG());
-            if (clientDTO.getNumeroTelefone() != null) clienteBanco.setNumeroTelefone(clientDTO.getNumeroTelefone());
-
-            ClientModel ninjasalvo = clientRepository.save(clienteBanco);
-            return clientMapper.map(ninjasalvo);
+        // Se for um NOVO cadastro (ID nulo), verificamos duplicatas
+        if (dto.getId() == null) {
+            if (clientRepository.existsByCPF(dto.getCPF())) {
+                throw new RuntimeException("Este CPF já está cadastrado!");
+            }
+            if (clientRepository.existsByRG(dto.getRG())) {
+                throw new RuntimeException("Este RG já está cadastrado!");
+            }
+            if (clientRepository.existsByEmail(dto.getEmail())) {
+                throw new RuntimeException("Este E-mail já está em uso!");
+            }
         }
-        return null;
+
+        clientRepository.save(clientMapper.map(dto));
     }
 
-    public void deletarclienteporid(Long id){
+    public void deletarclienteporid(Long id) {
         clientRepository.deleteById(id);
     }
+
 }

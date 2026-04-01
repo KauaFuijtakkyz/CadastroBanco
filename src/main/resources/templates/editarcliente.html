@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Cliente</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f8f9fa; padding: 40px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+
+        /* Alerta de Erro de Duplicata */
+        .alert-danger { padding: 12px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 5px; margin-bottom: 20px; text-align: center; font-weight: bold; }
+
+        .error-message { color: #e74c3c; font-size: 12px; font-weight: bold; margin-top: 5px; display: block; }
+        .input-error { border-color: #e74c3c; }
+
+        .btn-group { display: flex; gap: 10px; margin-top: 25px; }
+        .btn-save { flex: 2; background-color: #f39c12; color: white; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .btn-back { flex: 1; background-color: #95a5a6; color: white; padding: 12px; border-radius: 5px; text-align: center; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Editar Cliente</h1>
+
+    <!-- EXIBE MENSAGEM SE TENTAR MUDAR PARA UM DADO JÁ EXISTENTE -->
+    <div th:if="${erroDuplicata}" class="alert-danger">
+        <span th:text="${erroDuplicata}"></span>
+    </div>
+
+    <form th:action="@{/clientes/salvar}" th:object="${clientDTO}" method="POST">
+        <input type="hidden" th:field="*{id}">
+
+        <div class="form-group">
+            <label>Nome Completo</label>
+            <input type="text" th:field="*{nome}" th:classappend="${#fields.hasErrors('nome')} ? 'input-error'">
+            <span class="error-message" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></span>
+        </div>
+
+        <div class="form-group">
+            <label>E-mail</label>
+            <input type="email" th:field="*{email}" th:classappend="${#fields.hasErrors('email')} ? 'input-error'">
+            <span class="error-message" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+        </div>
+
+        <div style="display: flex; gap: 15px;">
+            <div class="form-group" style="flex: 1;">
+                <label>Idade</label>
+                <input type="number" th:field="*{idade}">
+                <span class="error-message" th:if="${#fields.hasErrors('idade')}" th:errors="*{idade}"></span>
+            </div>
+            <div class="form-group" style="flex: 2;">
+                <label>Telefone</label>
+                <input type="text" th:field="*{numeroTelefone}">
+                <span class="error-message" th:if="${#fields.hasErrors('numeroTelefone')}" th:errors="*{numeroTelefone}"></span>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 15px;">
+            <div class="form-group" style="flex: 1;">
+                <label>CPF</label>
+                <input type="text" th:field="*{CPF}" th:classappend="${#fields.hasErrors('CPF')} ? 'input-error'">
+                <span class="error-message" th:if="${#fields.hasErrors('CPF')}" th:errors="*{CPF}"></span>
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label>RG</label>
+                <input type="text" th:field="*{RG}" th:classappend="${#fields.hasErrors('RG')} ? 'input-error'">
+                <span class="error-message" th:if="${#fields.hasErrors('RG')}" th:errors="*{RG}"></span>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button type="submit" class="btn-save">Atualizar Dados</button>
+            <a th:href="@{/clientes/listar}" class="btn-back">Cancelar</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

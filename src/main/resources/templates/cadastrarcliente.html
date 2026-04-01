@@ -1,62 +1,75 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<html xmlns:th="http://thymeleaf.org" lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastro de Cliente</title>
+    <title>Novo Cliente</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; margin: 0; padding: 40px; color: #333; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f8f9fa; padding: 40px; }
         .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 25px; text-align: center; }
+        h1 { color: #2c3e50; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 15px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; color: #34495e; font-size: 14px; }
-        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; transition: 0.3s; }
-        input:focus { border-color: #3498db; outline: none; box-shadow: 0 0 5px rgba(52, 152, 219, 0.3); }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+
+        /* Alerta de Erro de Duplicata (Vermelho) */
+        .alert-danger { padding: 12px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 5px; margin-bottom: 20px; text-align: center; font-weight: bold; }
+
+        /* Mensagem de erro abaixo do campo */
+        .error-message { color: #e74c3c; font-size: 12px; font-weight: bold; margin-top: 5px; display: block; }
+        .input-error { border-color: #e74c3c; }
+
         .btn-group { display: flex; gap: 10px; margin-top: 25px; }
-        .btn-save { flex: 2; background-color: #27ae60; color: white; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.2s; text-align: center; text-decoration: none; }
-        .btn-save:hover { background-color: #219150; }
-        .btn-back { flex: 1; background-color: #95a5a6; color: white; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.2s; text-align: center; text-decoration: none; }
-        .btn-back:hover { background-color: #7f8c8d; }
+        .btn-save { flex: 2; background-color: #27ae60; color: white; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .btn-back { flex: 1; background-color: #95a5a6; color: white; padding: 12px; border-radius: 5px; text-align: center; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Novo Cliente</h1>
+    <h1>Cadastrar Cliente</h1>
 
-    <!-- th:object deve ser igual ao nome enviado no model.addAttribute do Controller -->
+    <!-- EXIBE MENSAGEM SE CPF/RG/EMAIL JÁ EXISTIR NO BANCO -->
+    <div th:if="${erroDuplicata}" class="alert-danger">
+        <span th:text="${erroDuplicata}"></span>
+    </div>
+
     <form th:action="@{/clientes/salvar}" th:object="${clientDTO}" method="POST">
 
         <div class="form-group">
             <label>Nome Completo</label>
-            <input type="text" th:field="*{nome}" placeholder="Ex: João Silva" required>
+            <input type="text" th:field="*{nome}" th:classappend="${#fields.hasErrors('nome')} ? 'input-error'">
+            <span class="error-message" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></span>
         </div>
 
         <div style="display: flex; gap: 15px;">
             <div class="form-group" style="flex: 1;">
                 <label>Idade</label>
-                <input type="number" th:field="*{idade}" placeholder="0" required>
+                <input type="number" th:field="*{idade}">
+                <span class="error-message" th:if="${#fields.hasErrors('idade')}" th:errors="*{idade}"></span>
             </div>
             <div class="form-group" style="flex: 2;">
                 <label>Telefone</label>
-                <!-- Verifique se no seu DTO o nome é numeroTelefone -->
-                <input type="text" th:field="*{numeroTelefone}" placeholder="(00) 00000-0000" required>
+                <input type="text" th:field="*{numeroTelefone}">
+                <span class="error-message" th:if="${#fields.hasErrors('numeroTelefone')}" th:errors="*{numeroTelefone}"></span>
             </div>
         </div>
 
         <div class="form-group">
             <label>E-mail</label>
-            <input type="email" th:field="*{email}" placeholder="exemplo@email.com" required>
+            <input type="email" th:field="*{email}" th:classappend="${#fields.hasErrors('email')} ? 'input-error'">
+            <span class="error-message" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
         </div>
 
         <div style="display: flex; gap: 15px;">
             <div class="form-group" style="flex: 1;">
                 <label>CPF</label>
-                <!-- th:field usa o nome EXATO do atributo na classe Java -->
-                <input type="text" th:field="*{CPF}" placeholder="000.000.000-00" required>
+                <input type="text" th:field="*{CPF}" th:classappend="${#fields.hasErrors('CPF')} ? 'input-error'">
+                <span class="error-message" th:if="${#fields.hasErrors('CPF')}" th:errors="*{CPF}"></span>
             </div>
             <div class="form-group" style="flex: 1;">
                 <label>RG</label>
-                <input type="text" th:field="*{RG}" placeholder="00.000.000-0" required>
+                <input type="text" th:field="*{RG}" th:classappend="${#fields.hasErrors('RG')} ? 'input-error'">
+                <span class="error-message" th:if="${#fields.hasErrors('RG')}" th:errors="*{RG}"></span>
             </div>
         </div>
 
