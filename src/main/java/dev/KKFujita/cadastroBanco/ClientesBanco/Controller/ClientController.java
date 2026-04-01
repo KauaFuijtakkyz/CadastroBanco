@@ -5,61 +5,61 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/clientes")
 public class ClientController {
 
-private final ClientService clientService;
+    private final ClientService clientService;
+
     @Autowired
     public ClientController(ClientService clientService) {
         this.clientService = clientService;
     }
 
-    @GetMapping("/boasvindas")
-    @Operation(summary = "Mensagem de boas vindas", description = "essa rota da uma mensagem de boas vindas para quem acessa ela")
-    public String boasvindas(){
-        return "Boas vindas";
-    }
-    @PostMapping("/adicionar")
-    public ResponseEntity<String> Adicionarcliente(@RequestBody ClientDTO cliente) {
-        ClientDTO clienteAdd = clientService.adicionarcliente(cliente);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Cliente adicionado com sucesso: " + clienteAdd.getNome() + " (ID): " + clienteAdd.getId());
-    }
+    // Exibe a tabela de clientes
     @GetMapping("/listar")
-    public ResponseEntity<List<ClientDTO>> listaclientes() {
+    public String listaclientes(Model model) {
         List<ClientDTO> listarclientes = clientService.listaclientes();
-        return ResponseEntity.ok(listarclientes);}
+        model.addAttribute("cliente", listarclientes);
+        return "listarclientes";
+    }
 
-    @GetMapping("/listar/{id}")
-    public ResponseEntity<?> listarclientesid(@PathVariable Long id) {
-        ClientDTO clientDTO = clientService.listarclientesid(id);
-        if (clientDTO != null){
-            return ResponseEntity.ok(clientDTO);
-        }else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("não existe cliente com esse ID");
-        }
+    // Exibe o formulário de cadastro
+    @GetMapping("/cadastrar")
+    public String exibirFormulario(Model model) {
+        model.addAttribute("clientDTO", new ClientDTO());
+        return "cadastrarcliente";
     }
-    @PatchMapping("/alterar/{id}")
-    public ResponseEntity<String> alterarclienteporid(@PathVariable Long id,@RequestBody ClientDTO  clienteatualizado) {
-        if (clientService.listarclientesid(id) != null){
-            clientService.atualizarcliente(id, clienteatualizado);
-            return ResponseEntity.ok("Cliente com id: " + id + " Alterado com sucesso");
-        }else {return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("o cliente com esse ID não existe");}
+
+    // Salva o cliente vindo do formulário
+    @PostMapping("/salvar")
+    public String salvarCliente(@ModelAttribute("clientDTO") ClientDTO dto, RedirectAttributes attributes) {
+        clientService.salvar(dto); // Agora este método funciona!
+        attributes.addFlashAttribute("mensagem", "Cliente " + dto.getNome() + " cadastrado com sucesso!");
+        return "redirect:/clientes/listar";
     }
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deletarclienteporid(@PathVariable Long id) {
+
+    // Deleta o cliente e redireciona
+    @GetMapping("/delete/{id}")
+    public String deletarclienteporid(@PathVariable Long id, RedirectAttributes attributes) {
         if (clientService.listarclientesid(id) != null) {
             clientService.deletarclienteporid(id);
-            return ResponseEntity.ok("Cliente com ID: " + id + " Deletado com sucesso");
-        }else {return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body("o cliente com esse ID não existe");
+            attributes.addFlashAttribute("mensagem", "Cliente removido com sucesso!");
         }
+        return "redirect:/clientes/listar";
+    }
+
+    // Mantido apenas para fins de teste/API se necessário
+    @GetMapping("/listar/{id}")
+    @ResponseBody // Adicionado para retornar JSON se você acessar essa URL direta
+    public ClientDTO listarclientesid(@PathVariable Long id) {
+        return clientService.listarclientesid(id);
     }
 }

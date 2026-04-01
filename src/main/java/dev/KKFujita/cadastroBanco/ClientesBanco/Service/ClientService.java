@@ -32,49 +32,41 @@ public class ClientService {
         return clientid.map(clientMapper::map).orElse(null);
     }
 
+    // Este é o método que o seu formulário usa!
+    public void salvar(ClientDTO dto) {
+        // 1. Converte DTO para Model (Entidade do banco)
+        ClientModel cliente = clientMapper.map(dto);
+        // 2. Salva no banco de dados através do Repository
+        clientRepository.save(cliente);
+    }
+
+    // Método usado para APIs ou chamadas internas
     public ClientDTO adicionarcliente (ClientDTO clientDTO) {
-        ClientModel ninja = clientMapper.map(clientDTO);
-        ninja = clientRepository.save(ninja);
-        return clientMapper.map(ninja);
+        ClientModel cliente = clientMapper.map(clientDTO);
+        cliente = clientRepository.save(cliente);
+        return clientMapper.map(cliente);
     }
 
     public ClientDTO atualizarcliente(Long id, ClientDTO clientDTO) {
-        // 1. Buscamos o cliente que já está no banco
         Optional<ClientModel> clienteExistente = clientRepository.findById(id);
 
         if (clienteExistente.isPresent()) {
             ClientModel clienteBanco = clienteExistente.get();
 
-            // 2. Só atualizamos o que não veio nulo no JSON
-            if (clientDTO.getNome() != null) {
-                clienteBanco.setNome(clientDTO.getNome());
-            }
-            if (clientDTO.getEmail() != null) {
-                clienteBanco.setEmail(clientDTO.getEmail());
-            }
-            if (clientDTO.getIdade() != null) {
-                clienteBanco.setIdade(clientDTO.getIdade());
-            }
-            if (clientDTO.getCPF() != null) {
-                clienteBanco.setCPF(clientDTO.getCPF());
-            }
-            if (clientDTO.getRG() != null) {
-                clienteBanco.setRG(clientDTO.getRG());
-            }
-            if (clientDTO.getNumeroTelefone() != null) {
-                clienteBanco.setNumeroTelefone(clientDTO.getNumeroTelefone());
-            }
+            if (clientDTO.getNome() != null) clienteBanco.setNome(clientDTO.getNome());
+            if (clientDTO.getEmail() != null) clienteBanco.setEmail(clientDTO.getEmail());
+            if (clientDTO.getIdade() != null) clienteBanco.setIdade(clientDTO.getIdade());
+            if (clientDTO.getCPF() != null) clienteBanco.setCPF(clientDTO.getCPF());
+            if (clientDTO.getRG() != null) clienteBanco.setRG(clientDTO.getRG());
+            if (clientDTO.getNumeroTelefone() != null) clienteBanco.setNumeroTelefone(clientDTO.getNumeroTelefone());
 
-            // 3. Salvamos o objeto do banco (com os dados antigos preservados)
             ClientModel ninjasalvo = clientRepository.save(clienteBanco);
             return clientMapper.map(ninjasalvo);
         }
-
-        return null; // Se não encontrar o ID
+        return null;
     }
 
     public void deletarclienteporid(Long id){
         clientRepository.deleteById(id);
     }
-
 }
