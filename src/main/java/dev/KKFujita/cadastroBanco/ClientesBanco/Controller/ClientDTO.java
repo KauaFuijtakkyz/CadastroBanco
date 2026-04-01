@@ -11,7 +11,7 @@ public class ClientDTO {
 
     private Long id;
     private String nome;
-    private int idade;
+    private Integer idade;
     private String email;
     private Long RG;
     private Long CPF;
